@@ -37,6 +37,11 @@ fn count_values_greater_than_prev(arr: Vec<i32>) -> usize {
         .count();
 }
 
+fn count_windows_greater_than_prev(arr: Vec<i32>, window_size: usize) -> usize {
+    let window_sums = window_sums(&arr, window_size);
+    return count_values_greater_than_prev(window_sums);
+}
+
 fn main() {
     let file_path = env::args().nth(1).expect("Expected file_path for arg 1");
     let window_size = env::args()
@@ -49,6 +54,38 @@ fn main() {
         .iter()
         .map(|s| s.parse::<i32>().unwrap())
         .collect();
-    let window_sums = window_sums(&raw_measurements, window_size);
-    println!("{}", count_values_greater_than_prev(window_sums));
+    let windows_greater_than_prev = count_windows_greater_than_prev(raw_measurements, window_size);
+    println!("{}", windows_greater_than_prev);
+}
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+
+    #[test]
+    fn test_empty_list() {
+        assert_eq!(count_windows_greater_than_prev(vec![], 1), 0);
+        assert_eq!(count_windows_greater_than_prev(vec![], 2), 0);
+        assert_eq!(count_windows_greater_than_prev(vec![], 3), 0);
+    }
+
+    #[test]
+    fn test_single_list() {
+        assert_eq!(count_windows_greater_than_prev(vec![1], 1), 0);
+    }
+
+    #[test]
+    fn test_some_small_lists() {
+        assert_eq!(count_windows_greater_than_prev(vec![1, 2], 1), 1);
+        assert_eq!(count_windows_greater_than_prev(vec![-3, 3], 1), 1);
+        assert_eq!(count_windows_greater_than_prev(vec![5, 4, 3], 1), 0);
+        assert_eq!(count_windows_greater_than_prev(vec![5, 4, 5], 1), 1);
+        assert_eq!(count_windows_greater_than_prev(vec![1, 7, 8, 9], 1), 3);
+    }
+    #[test]
+    fn test_some_small_windows() {
+        assert_eq!(count_windows_greater_than_prev(vec![1, 9, 2, 5], 1), 2);
+        assert_eq!(count_windows_greater_than_prev(vec![1, 9, 2, 5], 2), 1);
+        assert_eq!(count_windows_greater_than_prev(vec![1, 9, 2, 5], 3), 1);
+    }
 }
